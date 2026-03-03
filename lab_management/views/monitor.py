@@ -5,6 +5,7 @@ from django.views import View
 from django.shortcuts import render, get_object_or_404
 from django.http import JsonResponse
 from django.utils import timezone
+from django.utils.timezone import localtime
 
 # นำเข้า Models ที่เกี่ยวข้อง
 from lab_management.models import Computer, UsageLog, SiteConfig, Booking
@@ -96,8 +97,10 @@ class AdminMonitorDataAPIView(LoginRequiredMixin, View):
             next_booking_start_iso = None
             next_booking_student_id = None
             if next_booking:
-                next_booking_time = next_booking.start_time.strftime("%H:%M")
-                next_booking_start_iso = next_booking.start_time.isoformat()
+                # แก้ไข: แปลงเวลาเป็น Local Time (Timezone ท้องถิ่น) ก่อน
+                local_next_start = localtime(next_booking.start_time)
+                next_booking_time = local_next_start.strftime("%H:%M")
+                next_booking_start_iso = local_next_start.isoformat()
                 next_booking_student_id = next_booking.student_id
 
             # ตรวจสอบซอฟต์แวร์
@@ -118,7 +121,8 @@ class AdminMonitorDataAPIView(LoginRequiredMixin, View):
                 'next_booking_student_id': next_booking_student_id,
                 'software': software_name,
                 'is_ai': is_ai,
-                'last_updated': pc.last_updated.strftime("%H:%M:%S") if pc.last_updated else '-'
+                # แปลงเวลาอัปเดตสถานะล่าสุดให้เป็น Local Time ด้วย
+                'last_updated': localtime(pc.last_updated).strftime("%H:%M:%S") if pc.last_updated else '-'
             })
 
         # 2.2 ดึงข้อมูลคิวจองล่วงหน้าทั้งหมด (สำหรับแสดงในตารางแท็บ "คิวจองล่วงหน้า")
@@ -130,9 +134,13 @@ class AdminMonitorDataAPIView(LoginRequiredMixin, View):
 
         booking_list = []
         for b in future_bookings:
+            # แก้ไข: แปลงเวลาของคิวจองทั้งหมดให้เป็น Local Time
+            local_start = localtime(b.start_time)
+            local_end = localtime(b.end_time)
+            
             booking_list.append({
-                'date': b.start_time.strftime('%d/%m/%Y'),
-                'time': f"{b.start_time.strftime('%H:%M')} - {b.end_time.strftime('%H:%M')}",
+                'date': local_start.strftime('%d/%m/%Y'),
+                'time': f"{local_start.strftime('%H:%M')} - {local_end.strftime('%H:%M')}",
                 'pc_name': b.computer.name if b.computer else 'ไม่ระบุ',
                 'user_id': b.student_id,
                 'status': b.status
