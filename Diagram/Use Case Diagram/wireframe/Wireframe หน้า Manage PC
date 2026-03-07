@@ -1,0 +1,32 @@
+@startsalt
+' ตั้งค่าฟอนต์ให้เข้ากับเอกสารและขยายสเกลให้ภาพคมกริบ
+skinparam defaultFontName "Sarabun", "Tahoma", sans-serif
+scale 3
+
+{+
+  ' ส่วน Navigation Bar (ไฮไลต์ที่แท็บ Manage PC)
+  { [Monitor] | [Booking] | [ <b>Manage PC</b> ] | [Software] | [Report] | [Config] |   <b>Admin: สมศักดิ์ }
+  --
+  ' ส่วน Header
+  <b>จัดการเครื่องคอมพิวเตอร์
+  [ + เพิ่มเครื่องใหม่ ]
+  --
+  ' ส่วนฟอร์มเพิ่ม/แก้ไขเครื่อง
+  <b>เพิ่ม / แก้ไขเครื่อง
+  {
+    ชื่อเครื่อง: | "PC-01         "
+    สถานะ: | ^AVAILABLE       ^
+    Software: | ^Python/Jupyter   ^
+    { [ บันทึก ] | [ ยกเลิก ] } | .
+  }
+  --
+  ' ส่วนตารางข้อมูลรายการเครื่องคอมพิวเตอร์
+  {
+    <b>ชื่อเครื่อง | <b>สถานะ | <b>Software | <b>จัดการ
+    PC-01 | <color:green>AVAILABLE</color> | Python/Jupyter | { [แก้ไข] | [ลบ] }
+    PC-02 | <color:red>IN_USE</color> | General | { [แก้ไข] | [ลบ] }
+    PC-03 | <color:orange>RESERVED</color> | ChatGPT Plus | { [แก้ไข] | [ลบ] }
+    PC-04 | <color:#888888>MAINTENANCE</color> | - | { [แก้ไข] | [ลบ] }
+  }
+}
+@endsalt

@@ -1,0 +1,27 @@
+@startsalt
+' ตั้งค่าฟอนต์ให้เข้ากับเอกสารและขยายสเกลให้ภาพคมกริบ
+skinparam defaultFontName "Sarabun", "Tahoma", sans-serif
+scale 3
+
+{+
+  ' ส่วน Navigation Bar
+  { [Monitor] | [Booking] | [Manage PC] | [Software] | [Report] | [Config] |   <b>Admin: สมศักดิ์ }
+  --
+  ' ส่วน Header
+  { <b>Monitor Dashboard | อัปเดตล่าสุด: 14:32:05 }
+  --
+  ' ส่วนสรุปสถานะ (สถิติ)
+  { <color:green>ว่าง: 12</color> | <color:red>ใช้งาน: 5</color> | <color:orange>จอง: 2</color> | <color:#888888>แจ้งซ่อม: 1</color> }
+  --
+  ' ส่วน Tab เลือกดูข้อมูล
+  {/ <b>สถานะ Real-time | รายการจอง }
+  
+  ' ส่วนแสดงการ์ด PC (จำลองเป็นตาราง 4 คอลัมน์)
+  {
+    <color:red><b>[ PC-01 ]</b></color> | <color:green><b>[ PC-02 ]</b></color> | <color:orange><b>[ PC-03 ]</b></color> | <color:#888888><b>[ PC-04 ]</b></color>
+    นายสมชาย ใจดี | ว่าง | จอง 15:00-17:00 | แจ้งซ่อม
+    00:42:17 | | | 
+    [ Force Logout ] | [   Check-in   ] | | 
+  }
+}
+@endsalt

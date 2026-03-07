@@ -1,0 +1,20 @@
+@startsalt
+' ตั้งค่าฟอนต์ให้เข้ากับเอกสารและขยายสเกลให้ภาพคมกริบ
+skinparam defaultFontName "Sarabun", "Tahoma", sans-serif
+scale 3
+
+{+
+  <b>CKLab  PC-01
+  --
+  ยินดีต้อนรับ
+  <b>นายสมชาย ใจดี
+  คณะวิทยาศาสตร์ นักศึกษา ปี 3
+  --
+  Software: Python / Jupyter Notebook
+  --
+  <b>เวลาที่ใช้งาน
+  " 00 : 42 : 17                  "
+  
+  [          เช็คเอาท์          ]
+}
+@endsalt

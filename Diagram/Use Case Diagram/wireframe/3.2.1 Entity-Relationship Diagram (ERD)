@@ -1,0 +1,122 @@
+@startuml er_diagram
+!theme plain
+
+' --- ตั้งค่าฟอนต์และสไตล์ ---
+skinparam defaultFontName "Sarabun", "Tahoma", sans-serif
+skinparam defaultFontSize 14
+skinparam dpi 300
+skinparam nodesep 60
+skinparam ranksep 70
+skinparam linetype ortho
+
+' --- ปรับสีให้สว่างขึ้นเพื่อให้อ่านตัวอักษรได้ชัดเจน 100% ---
+skinparam class {
+    BackgroundColor #FFFFFF
+    BorderColor #2C7BE5
+    BorderThickness 1.5
+    HeaderBackgroundColor #EAF3FF
+    FontColor #000000
+    FontSize 15
+    AttributeFontColor #333333
+    AttributeFontSize 13
+}
+
+' --- ตั้งค่าสีเส้นเชื่อมและตัวหนังสือบนเส้นไม่ให้กลืนกัน ---
+skinparam arrow {
+    Color #444444
+    Thickness 1.5
+    FontColor #000000
+    FontSize 13
+}
+
+hide methods
+hide circle
+
+title โครงสร้างฐานข้อมูล (Entity Relationship Diagram)
+
+' --- เริ่มกำหนดตาราง (Entities) ---
+
+class "SiteConfig" as SiteConfig {
+  + id : Integer <<PK>>
+  --
+  lab_name : CharField(100)
+  location : CharField(200)
+  is_open : BooleanField
+  booking_enabled : BooleanField
+  announcement : TextField <<blank>>
+  feedback_url : URLField <<nullable>>
+  --
+  admin_on_duty_id : FK <<nullable>>
+}
+
+class "AdminonDuty" as AdminonDuty {
+  + id : Integer <<PK>>
+  --
+  admin_on_duty : CharField(100)
+  contact_email : EmailField
+  contact_phone : CharField(20)
+}
+
+class "Computer" as Computer {
+  + id : Integer <<PK>>
+  --
+  name : CharField(20) <<unique>>
+  status : CharField [AVAILABLE | IN_USE | RESERVED | MAINTENANCE]
+  description : TextField <<nullable>>
+  last_updated : DateTimeField <<auto>>
+  --
+  Software_id : FK <<nullable>>
+}
+
+class "Software" as Software {
+  + id : Integer <<PK>>
+  --
+  name : CharField(100)
+  version : CharField(100)
+  type : CharField [Software | AI Tool]
+  expire_date : DateField <<nullable>>
+}
+
+class "Booking" as Booking {
+  + id : Integer <<PK>>
+  --
+  student_id : CharField(20)
+  start_time : DateTimeField
+  end_time : DateTimeField
+  booking_date : DateTimeField <<auto>>
+  status : CharField [PENDING | APPROVED | REJECTED]
+  created_at : DateTimeField <<auto>>
+  --
+  computer_id : FK
+}
+
+class "UsageLog" as UsageLog {
+  + id : Integer <<PK>>
+  --
+  user_id : CharField(50)
+  user_name : CharField(100)
+  user_type : CharField [student | staff | guest]
+  department : CharField(100) <<blank>>
+  user_year : CharField(10) <<blank>>
+  computer : CharField(20) <<snapshot>>
+  Software : CharField(100) <<snapshot>>
+  start_time : DateTimeField <<auto>>
+  end_time : DateTimeField <<nullable>>
+}
+
+' --- กำหนดความสัมพันธ์ (Relationships) ---
+
+AdminonDuty "1" <-- "0..1" SiteConfig : "admin_on_duty"
+Software "1" <-- "0..*" Computer : "Software"
+Computer "1" <-- "0..*" Booking : "computer"
+
+' --- คำอธิบายเพิ่มเติม ---
+note bottom of UsageLog
+  **หมายเหตุ:**
+  ฟิลด์ computer และ Software ในตาราง UsageLog 
+  ถูกบันทึกเป็น CharField (snapshot ข้อมูล ณ เวลา Check-in)
+  **ไม่ใช่ Foreign Key** เพื่อรักษาประวัติการใช้งาน
+  ในกรณีที่ข้อมูล PC หรือ Software ต้นทางถูกลบในอนาคต
+end note
+
+@enduml

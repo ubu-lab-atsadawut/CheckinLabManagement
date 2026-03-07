@@ -1,0 +1,73 @@
+@startuml fig3_14
+!theme plain
+
+' --- ตั้งค่าฟอนต์ให้อ่านง่ายและตัวใหญ่ขึ้น ---
+skinparam defaultFontName "Sarabun", "Tahoma", sans-serif
+skinparam defaultFontSize 18
+skinparam TitleFontSize 26
+skinparam TitleFontStyle bold
+skinparam DefaultTextAlignment center
+
+' --- ตั้งค่าความคมชัดและขยายขนาดกล่อง (Padding) ---
+skinparam dpi 300
+skinparam ActivityPadding 25
+skinparam ActivityDiamondPadding 35
+skinparam ArrowThickness 1.5
+
+' --- ตั้งค่าสีสัน ---
+skinparam ActivityBackgroundColor #EAF3FF
+skinparam ActivityBorderColor #2C7BE5
+skinparam ActivityBorderThickness 1.5
+skinparam ActivityDiamondBackgroundColor #FFF3CD
+skinparam ActivityDiamondBorderColor #F59E0B
+skinparam ArrowColor #444444
+
+title กระบวนการจองเครื่องคอมพิวเตอร์ล่วงหน้า (Booking)
+
+|Admin (Portal)|
+start
+:กรอกข้อมูลการจอง\n(รหัสผู้ใช้, เครื่อง, วันที่,\nเวลาเริ่ม-สิ้นสุด);
+:กดปุ่ม "เพิ่มการจอง";
+
+|ระบบ (Django)|
+:ตรวจสอบความถูกต้อง\nของข้อมูล;
+
+' ใช้ทริค \n และ space ดันกล่องเงื่อนไขให้กว้าง
+if (\n   ข้อมูลถูกต้องหรือไม่?   \n   (เวลาเริ่ม < เวลาสิ้นสุด   \n   และไม่ย้อนหลัง)   \n) then (ใช่)
+  :สร้าง Booking\nด้วยสถานะ PENDING;
+  
+  |Admin (Portal)|
+  :เห็นรายการ Booking\nสถานะ PENDING;
+  :กดปุ่ม "อนุมัติ" หรือ "ปฏิเสธ";
+  
+  |ระบบ (Django)|
+  ' ใช้ทริค \n และ space ดันกล่องเงื่อนไขให้กว้าง
+  if (\n   Admin กดอนุมัติ   \n   หรือไม่?   \n) then (อนุมัติ)
+    :อัปเดตสถานะ Booking\nเป็น APPROVED;
+    note right
+      Monitor Dashboard จะแสดง
+      "จองถัดไป" บนการ์ด PC
+    end note
+  else (ปฏิเสธ)
+    :อัปเดตสถานะ Booking\nเป็น REJECTED;
+  endif
+  
+  |Admin (Portal)|
+  :เห็นสถานะ Booking\nที่อัปเดตแล้ว;
+  stop
+else (ไม่)
+  |ระบบ (Django)|
+  :แสดงข้อความ Error\n(ภาษาไทย);
+  
+  |Admin (Portal)|
+  :กลับไปแก้ไขข้อมูล\nและส่งใหม่;
+endif
+
+floating note
+  **การทำงานเพิ่มเติมกรณี Import CSV:**
+  - อ่านไฟล์ CSV (header: วันที่, เวลา, ผู้จอง, เครื่อง)
+  - สร้าง Booking ทุกแถวด้วยสถานะ APPROVED ทันที
+  - รองรับรูปแบบวันที่ DD/MM/YYYY และ YYYY-MM-DD
+end note
+
+@enduml

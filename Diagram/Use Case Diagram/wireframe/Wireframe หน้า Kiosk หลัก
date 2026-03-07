@@ -1,0 +1,24 @@
+@startsalt
+' ตั้งค่าฟอนต์ให้เข้ากับเอกสารและขยายสเกลให้ภาพคมกริบ
+skinparam defaultFontName "Sarabun", "Tahoma", sans-serif
+scale 3
+
+{+
+  ' ส่วน Tab
+  {/ <b>UBU WiFi (ภายใน) | Guest Login }
+  --
+  ' ส่วน Header
+  <b>CKLab Computer Center
+  ห้องปฏิบัติการคอมพิวเตอร์ อาคาร 4 ชั้น 2
+  --
+  ' ส่วน Form
+  กรุณากรอกรหัส UBU WiFi ของท่าน
+  " ชื่อผู้ใช้งาน (Username)                 "
+  " รหัสผ่าน (Password)                     "
+  
+  [          เช็คอิน (UBU WiFi)          ]
+  --
+  ' ส่วน Footer
+  ติดต่อผู้ดูแล: 045-353-xxx
+}
+@endsalt

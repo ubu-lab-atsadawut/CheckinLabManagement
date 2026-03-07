@@ -1,0 +1,35 @@
+@startsalt
+' ตั้งค่าฟอนต์ให้เข้ากับเอกสารและขยายสเกลให้ภาพคมกริบ
+skinparam defaultFontName "Sarabun", "Tahoma", sans-serif
+scale 3
+
+{+
+  ' ส่วน Navigation Bar (ไฮไลต์ที่แท็บ Software)
+  { [Monitor] | [Booking] | [Manage PC] | [ <b>Software</b> ] | [Report] | [Config] |   <b>Admin: สมศักดิ์ }
+  --
+  ' ส่วน Header
+  <b>จัดการซอฟต์แวร์และเครื่องมือ AI
+  --
+  ' ส่วนสรุปจำนวน (แยกตามสีเหมือนในภาพ)
+  { <color:blue>Software ทั้งหมด: 8</color> | <color:#D123B3>AI Tool: 3</color> | Software ทั่วไป: 5 }
+  --
+  ' ส่วนฟอร์มเพิ่มซอฟต์แวร์ใหม่
+  <b>เพิ่มซอฟต์แวร์ใหม่
+  {
+    ชื่อ: | "Python / Anaconda       "
+    เวอร์ชัน: | "3.11.5                  "
+    ประเภท: | { (X) Software | () AI Tool }
+    วันหมดอายุ: | "[               ]" | <i>(ถ้ามี)
+    [ บันทึก ] | .
+  }
+  --
+  ' ส่วนตารางข้อมูลรายการซอฟต์แวร์
+  {
+    <b>ชื่อ | <b>เวอร์ชัน | <b>ประเภท | <b>หมดอายุ | <b>จัดการ
+    Python/Jupyter | 3.11 | Software | - | { [แก้ไข] | [ลบ] }
+    ChatGPT Plus | 2024 | AI Tool | 2025-12-31 | { [แก้ไข] | [ลบ] }
+    Claude Pro | 2024 | AI Tool | 2025-06-30 | { [แก้ไข] | [ลบ] }
+    MATLAB | R2024a | Software | 2025-08-01 | { [แก้ไข] | [ลบ] }
+  }
+}
+@endsalt

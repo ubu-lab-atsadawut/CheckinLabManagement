@@ -1,0 +1,25 @@
+@startsalt
+' ตั้งค่าฟอนต์ให้เข้ากับเอกสารและขยายสเกลให้ภาพคมกริบ
+skinparam defaultFontName "Sarabun", "Tahoma", sans-serif
+scale 3
+
+{+
+  ' ส่วน Navigation Bar (ไฮไลต์ที่แท็บ Booking)
+  { [Monitor] | [ <b>Booking</b> ] | [Manage PC] | [Software] | [Report] | [Config] |   <b>Admin: สมศักดิ์ }
+  --
+  ' ส่วน Header และปุ่มจัดการ
+  <b>จัดการการจอง (Booking)
+  { [ + เพิ่มการจอง ] | [ นำเข้า CSV ] }
+  --
+  ' ส่วนตารางข้อมูล
+  {
+    <b>วันที่ | <b>เวลา | <b>ผู้จอง | <b>เครื่อง | <b>สถานะ | <b>จัดการ
+    2568-03-01 | 09:00-11:00 | 6501234567 | PC-03 | <color:green>APPROVED</color> | [ ดู ]
+    2568-03-01 | 13:00-15:00 | 6507654321 | PC-05 | <color:orange>PENDING</color> | { [ อนุมัติ ] | [ ปฏิเสธ ] }
+    2568-03-02 | 10:00-12:00 | 6509876543 | PC-01 | <color:red>REJECTED</color> | [ ดู ]
+  }
+  --
+  ' ส่วน Footer แสดงจำนวนรายการ
+  <i>แสดง 3 รายการ จากทั้งหมด 12 รายการ
+}
+@endsalt

@@ -1,0 +1,63 @@
+@startuml fig3_13
+!theme plain
+
+' --- ตั้งค่าฟอนต์ให้อ่านง่ายและตัวใหญ่ขึ้น ---
+skinparam defaultFontName "Sarabun", "Tahoma", sans-serif
+skinparam defaultFontSize 18
+skinparam TitleFontSize 26
+skinparam TitleFontStyle bold
+skinparam DefaultTextAlignment center
+
+' --- ตั้งค่าความคมชัดและขยายขนาดกล่อง (Padding) ---
+skinparam dpi 300
+skinparam ActivityPadding 25
+skinparam ActivityDiamondPadding 35
+skinparam ArrowThickness 1.5
+
+' --- ตั้งค่าสีสัน ---
+skinparam ActivityBackgroundColor #EAF3FF
+skinparam ActivityBorderColor #2C7BE5
+skinparam ActivityBorderThickness 1.5
+skinparam ActivityDiamondBackgroundColor #FFF3CD
+skinparam ActivityDiamondBorderColor #F59E0B
+skinparam ArrowColor #444444
+
+title กระบวนการ Check-out และการเก็บ Feedback (Google Form)
+
+|ผู้ใช้งาน (Kiosk)|
+start
+:กดปุ่ม "เช็คเอาท์"\nบนหน้า Timer;
+
+|ระบบ (Django)|
+:ค้นหา UsageLog ที่ active\n(end_time = null)\nของเครื่องนั้น;
+
+' ใช้ทริค \n และ space ดันกล่องเงื่อนไขให้กว้าง
+if (\n   พบ UsageLog   \n   ที่ active หรือไม่?   \n) then (ใช่)
+  :บันทึก end_time\nเป็นเวลาปัจจุบัน;
+  :อัปเดตสถานะ Computer\nเป็น AVAILABLE;
+  :Redirect ไปหน้า Feedback;
+  
+  |ผู้ใช้งาน (Kiosk)|
+  if (\n   ต้องการประเมิน   \n   หรือไม่?   \n) then (ประเมิน)
+    :ระบบเปิดลิงก์ Google Form;
+    note right
+      ผู้ใช้ทำแบบประเมินผ่าน Google Form
+      ข้อมูลจะถูกบันทึกลง Google Sheet
+    end note
+    :เมื่อทำเสร็จ กดยืนยัน;
+  else (ไม่ประเมิน)
+    :กดปุ่ม "ข้าม" (Skip);
+  endif
+  
+  |ระบบ (Django)|
+  :Redirect ไปหน้าหลัก Kiosk;
+  stop
+
+else (ไม่)
+  |ระบบ (Django)|
+  :แก้สถานะ Computer เป็น AVAILABLE\nอัตโนมัติ (Ghost State Fix);
+  :Redirect ไปหน้าหลัก Kiosk;
+  stop
+endif
+
+@enduml
