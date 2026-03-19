@@ -4,7 +4,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
 from django.contrib import messages
 from ..models import SiteConfig, AdminonDuty
-from ..forms import SiteConfigForm, AdminUserForm, AdminUserEditForm # เพิ่ม AdminUserEditForm เข้ามา
+from ..forms import SiteConfigForm, AdminUserForm, AdminUserEditForm
 
 class AdminConfigView(LoginRequiredMixin, View):
     def get(self, request):
@@ -34,7 +34,6 @@ class AdminConfigView(LoginRequiredMixin, View):
                     duty_obj.save()
                     config.admin_on_duty = duty_obj
                 
-                # ✅ รับค่า "ลิงก์ Google Form" จากหน้าเว็บมาบันทึกลงฐานข้อมูลโดยตรง
                 if 'feedback_url' in request.POST:
                     config.feedback_url = request.POST.get('feedback_url')
                 
@@ -47,13 +46,14 @@ class AdminConfigView(LoginRequiredMixin, View):
             form = AdminUserForm(request.POST)
             if form.is_valid():
                 user = form.save(commit=False)
-                user.username = "hello"
                 user.set_password(form.cleaned_data['password'])
                 user.is_staff = True
+                
                 if request.POST.get('role') == 'Super Admin':
                     user.is_superuser = True
+                    
                 user.save()
-                messages.success(request, f'เพิ่มผู้ดูแล {user.username} เรียบร้อย')
+                messages.success(request, f'เพิ่มผู้ดูแล {user.username} เรียบร้อยแล้ว')
             else:
                 messages.error(request, 'ข้อมูลแอดมินไม่ถูกต้อง หรือ Username ซ้ำ')
 
@@ -63,10 +63,9 @@ class AdminUserDeleteView(LoginRequiredMixin, View):
     def post(self, request, pk):
         user_to_delete = get_object_or_404(User, pk=pk)
         
-        # ป้องกันการลบตัวเองเพื่อความปลอดภัยของระบบ
         if user_to_delete == request.user:
             messages.error(request, "ไม่สามารถลบบัญชีที่กำลังใช้งานอยู่ได้")
-            return redirect('admin_users') # เปลี่ยนเส้นทางกลับไปที่หน้า Manage Users
+            return redirect('admin_users')
             
         if user_to_delete.is_superuser and not request.user.is_superuser:
             messages.error(request, "คุณไม่มีสิทธิ์ลบ Super Admin")
@@ -77,16 +76,10 @@ class AdminUserDeleteView(LoginRequiredMixin, View):
         messages.success(request, f"ลบผู้ดูแลระบบ {username} เรียบร้อยแล้ว")
         return redirect('admin_users')
 
-# -------------------------------------------------------------------
-# ฟังก์ชันสำหรับจัดการผู้ใช้งาน (Manage Users)
-# -------------------------------------------------------------------
-
 class AdminUserView(LoginRequiredMixin, View):
     def get(self, request):
-        # ดึงรายชื่อ Admin ทั้งหมด (เรียงเอาคนที่ Active ขึ้นก่อน ตามด้วยชื่อ)
         admin_users = User.objects.filter(is_staff=True).order_by('-is_active', '-is_superuser', 'username')
         
-        # คำนวณสถิติเพื่อแสดงในการ์ดด้านบน
         total_users = admin_users.count()
         active_users = admin_users.filter(is_active=True).count()
         
@@ -98,12 +91,15 @@ class AdminUserView(LoginRequiredMixin, View):
         return render(request, 'cklab/admin/admin-users.html', context)
 
     def post(self, request):
-        # รับค่าจาก Modal "เพิ่มแอดมินใหม่"
         form = AdminUserForm(request.POST)
         if form.is_valid():
             user = form.save(commit=False)
             user.set_password(form.cleaned_data['password'])
-            user.is_staff = True # ให้สิทธิ์เข้าหน้า Admin
+            user.is_staff = True
+            
+            if request.POST.get('role') == 'Super Admin':
+                user.is_superuser = True
+                
             user.save()
             messages.success(request, f'เพิ่มผู้ดูแลระบบ {user.username} สำเร็จ')
         else:
@@ -113,10 +109,7 @@ class AdminUserView(LoginRequiredMixin, View):
 
 class AdminUserEditView(LoginRequiredMixin, View):
     def get(self, request, pk):
-        # ดึงข้อมูลแอดมินที่ต้องการแก้ไข
         user_to_edit = get_object_or_404(User, pk=pk)
-        
-        # สร้างฟอร์มโดยดึงข้อมูลเก่ามาใส่ไว้
         form = AdminUserEditForm(instance=user_to_edit)
         
         return render(request, 'cklab/admin/admin-users-edit.html', {
@@ -127,10 +120,8 @@ class AdminUserEditView(LoginRequiredMixin, View):
     def post(self, request, pk):
         user_to_edit = get_object_or_404(User, pk=pk)
         
-        # ตรวจสอบสถานะ Active จาก Switch (ถ้าถูกเปิดจะส่งค่า 'on' มา)
         is_active_checked = request.POST.get('is_active') == 'on'
         
-        # ระบบป้องกัน: ไม่ให้แอดมินทั่วไป ปิดการใช้งานบัญชีตัวเอง หรือปิดของ Super Admin
         if not is_active_checked:
              if user_to_edit == request.user:
                  messages.error(request, 'คุณไม่สามารถปิดการใช้งานบัญชีของตนเองได้')
@@ -139,12 +130,16 @@ class AdminUserEditView(LoginRequiredMixin, View):
                  messages.error(request, 'คุณไม่มีสิทธิ์ปิดการใช้งาน Super Admin')
                  return redirect('admin_user_edit', pk=pk)
 
-        # อัปเดตข้อมูลจาก Form บนหน้าเว็บ
         user_to_edit.username = request.POST.get('username')
         user_to_edit.email = request.POST.get('email', '')
         user_to_edit.first_name = request.POST.get('first_name', '')
         user_to_edit.last_name = request.POST.get('last_name', '')
         user_to_edit.is_active = is_active_checked
+        
+        # ✅ รับค่ารหัสผ่านใหม่ (ถ้าปล่อยว่างคือไม่เปลี่ยน)
+        new_password = request.POST.get('password')
+        if new_password:
+             user_to_edit.set_password(new_password)
         
         try:
              user_to_edit.save()

@@ -21,6 +21,10 @@ class IndexView(View):
     def get(self, request):
         config = SiteConfig.objects.first()
         
+        # ✅ เพิ่มการดักจับ: เผื่อกรณีที่ระบบยังไม่มีการตั้งค่าใดๆ เลย ให้สร้างค่าเริ่มต้นไว้
+        if not config:
+            config = SiteConfig.objects.create(lab_name="CKLab", is_open=True)
+        
         # บังคับใช้ PC-01 เป็นค่าเริ่มต้นหากไม่ได้ระบุใน URL
         pc_name = request.GET.get('pc')
         if not pc_name:
@@ -138,7 +142,7 @@ class VerifyUserAPIView(View):
                 student_year = str(user_data.get('STUDENTYEAR', '-'))
 
                 # ==========================================
-                # ✅ เพิ่มลอจิกคัดกรอง "บุคลากร/อาจารย์"
+                # ✅ ลอจิกคัดกรอง "บุคลากร/อาจารย์"
                 # ==========================================
                 role = 'student'
                 staff_prefixes = ['อาจารย์', 'ดร.', 'ผศ.', 'รศ.', 'ศ.', 'นพ.', 'พญ.']
@@ -217,7 +221,7 @@ class CheckinView(View):
             computer.status = 'IN_USE'
             computer.save()
 
-            # ✅ แก้ไขแล้ว: ดึงเวลาปัจจุบันมาแปลงเป็น Timestamp เลย ป้องกันปัญหาเวลาค้าง 00:00:00
+            # ✅ แปลงเป็น Timestamp เลย ป้องกันปัญหาเวลาค้าง 00:00:00
             start_time_ms = int(timezone.now().timestamp() * 1000)
 
             context = {
